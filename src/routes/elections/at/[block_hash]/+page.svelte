@@ -1,5 +1,5 @@
-<!-- routes/elections/at/[block_hash]/+page.svelte -->
 <script lang="ts">
+  import type { PageProps } from "./$types";
   import { onMount } from "svelte";
   import * as echarts from "echarts/core";
   import { BarChart, LineChart, ScatterChart } from "echarts/charts";
@@ -37,11 +37,11 @@
   ]);
 
   // Get the data from PageServerLoad
-  export let data;
-  const { blockHash, electionData } = data;
+  const { data }: PageProps = $props();
+  const electionData = data.data.election.electionData;
 
   // State variables
-  let activeTab = "results";
+  let activeTab = $state("results");
 
   // Chart instances storage
   const chartInstances = new Map();
@@ -81,7 +81,7 @@
     );
 
     // Prepare data for visualization
-    const candidates = sortedResults.map((result) => result.candidate);
+    const candidates = sortedResults.map((result) => result.id);
     const scores = sortedResults.map((result) => ({
       value: result.finalScore * 1000000, // Scale for visibility
       itemStyle: {
@@ -106,7 +106,7 @@
           const dataIndex = params[0].dataIndex;
           const result = sortedResults[dataIndex];
           return `
-            <strong>${result.candidate}</strong><br>
+            <strong>${result.id}</strong><br>
             Score: ${result.finalScore.toFixed(6)}<br>
             Role: ${result.role}<br>
             Initial Stake: ${result.initialStake}<br>
@@ -602,11 +602,13 @@
 <div class="container">
   <div class="header">
     <h1>Liberland Vote Scope</h1>
-    {#if blockHash === "latest"}
+    {#if data.data.blockHash === "latest"}
       <p class="subtitle">Council Election Simulation at Current Block</p>
     {:else}
       <p class="subtitle">
-        Council Election at Block: <span class="block-hash">{blockHash}</span>
+        Council Election at Block: <span class="block-hash"
+          >{data.data.blockHash}</span
+        >
       </p>
     {/if}
   </div>
@@ -615,25 +617,25 @@
     <div class="tabs">
       <button
         class="tab-button {activeTab === 'results' ? 'active' : ''}"
-        on:click={() => setActiveTab("results")}
+        onclick={() => setActiveTab("results")}
       >
         Election Results
       </button>
       <button
         class="tab-button {activeTab === 'comparison' ? 'active' : ''}"
-        on:click={() => setActiveTab("comparison")}
+        onclick={() => setActiveTab("comparison")}
       >
         Stake Comparison
       </button>
       <button
         class="tab-button {activeTab === 'scatter' ? 'active' : ''}"
-        on:click={() => setActiveTab("scatter")}
+        onclick={() => setActiveTab("scatter")}
       >
         Score vs Stake
       </button>
       <button
         class="tab-button {activeTab === 'progression' ? 'active' : ''}"
-        on:click={() => setActiveTab("progression")}
+        onclick={() => setActiveTab("progression")}
       >
         Rounds Progression
       </button>
@@ -710,21 +712,6 @@
           chosen candidates.
         </li>
       </ul>
-    </div>
-  </div>
-
-  <div class="legend">
-    <div class="legend-item">
-      <div class="color-box member"></div>
-      <span>Council Member</span>
-    </div>
-    <div class="legend-item">
-      <div class="color-box runnerup"></div>
-      <span>Runner Up</span>
-    </div>
-    <div class="legend-item">
-      <div class="color-box not-elected"></div>
-      <span>Not Elected</span>
     </div>
   </div>
 </div>
@@ -853,37 +840,6 @@
     color: #64748b;
   }
 
-  .legend {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-    margin-bottom: 30px;
-  }
-
-  .legend-item {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .color-box {
-    width: 20px;
-    height: 20px;
-    border-radius: 4px;
-  }
-
-  .color-box.member {
-    background-color: #2563eb;
-  }
-
-  .color-box.runnerup {
-    background-color: #7c3aed;
-  }
-
-  .color-box.not-elected {
-    background-color: #94a3b8;
-  }
-
   @media (max-width: 768px) {
     .chart {
       height: 400px;
@@ -894,4 +850,3 @@
     }
   }
 </style>
-
