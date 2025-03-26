@@ -39,7 +39,6 @@
   // Get the data from PageServerLoad
   const { data }: PageProps = $props();
   const electionData = data.data.election.electionData;
-
   // State variables
   let activeTab = $state("results");
 
@@ -77,13 +76,13 @@
   function getElectionResultsOptions() {
     // Sort candidates by score
     const sortedResults = [...electionData.finalResults].sort(
-      (a, b) => b.finalScore - a.finalScore,
+      (a, b) => a.finalScore - b.finalScore,
     );
 
     // Prepare data for visualization
-    const candidates = sortedResults.map((result) => result.id);
+    const candidates = sortedResults.map((result) => result.id.address);
     const scores = sortedResults.map((result) => ({
-      value: result.finalScore * 1000000, // Scale for visibility
+      value: result.finalScore * 100000000, // Scale for visibility
       itemStyle: {
         color:
           result.role === "Member"
@@ -93,6 +92,15 @@
               : "#94a3b8",
       },
     }));
+
+    // Find actual threshold values by looking at the roles
+    const memberThreshold =
+      sortedResults.find((r) => r.role === "Member")?.finalScore * 100000000000;
+    const runnerUpThreshold =
+      sortedResults.find((r) => r.role === "RunnerUp")?.finalScore * 100000000;
+    console.log(sortedResults);
+    console.log("Member threshold:", memberThreshold);
+    console.log("RunnerUp threshold:", runnerUpThreshold);
 
     return {
       title: {
@@ -106,8 +114,8 @@
           const dataIndex = params[0].dataIndex;
           const result = sortedResults[dataIndex];
           return `
-            <strong>${result.id}</strong><br>
-            Score: ${result.finalScore.toFixed(6)}<br>
+            <strong>${result.id.address}</strong><br>
+            Score: ${result.finalScore.toFixed(20)}<br>
             Role: ${result.role}<br>
             Initial Stake: ${result.initialStake}<br>
             Final Stake: ${result.finalStake}
@@ -128,13 +136,23 @@
         type: "category",
         data: candidates,
         axisLabel: {
+          formatter: function (value) {
+            if (value.length <= 10) {
+              return value;
+            }
+            const firstFive = value.substring(0, 5);
+            const lastFive = value.substring(value.length - 5);
+            return `${firstFive}..${lastFive}`;
+          },
           interval: 0,
           rotate: 45,
+          inside: false,
         },
       },
       yAxis: {
         type: "value",
-        name: "Score (scaled)",
+        name: "Score (lower is better)",
+        inverse: false,
       },
       series: [
         {
@@ -150,7 +168,7 @@
             },
             data: [
               {
-                yAxis: sortedResults[6].finalScore * 1000000, // Member threshold
+                yAxis: memberThreshold, // Member threshold
                 label: {
                   formatter: "Member Threshold",
                   position: "middle",
@@ -158,7 +176,7 @@
                 },
               },
               {
-                yAxis: sortedResults[13].finalScore * 1000000, // RunnerUp threshold
+                yAxis: runnerUpThreshold, // RunnerUp threshold
                 label: {
                   formatter: "RunnerUp Threshold",
                   position: "middle",
@@ -236,7 +254,7 @@
   function getStakeComparisonOptions() {
     // Sort by score to maintain the same order as results chart
     const sortedResults = [...electionData.finalResults].sort(
-      (a, b) => b.finalScore - a.finalScore,
+      (a, b) => a.finalScore - b.finalScore,
     );
 
     return {
@@ -251,7 +269,7 @@
           const dataIndex = params[0].dataIndex;
           const result = sortedResults[dataIndex];
           return `
-            <strong>${result.candidate}</strong><br>
+            <strong>${result.id.address}</strong><br>
             Role: ${result.role}<br>
             Initial Stake: ${params[0].value}<br>
             Final Stake: ${params[1].value}<br>
@@ -259,10 +277,10 @@
           `;
         },
       },
-      legend: {
-        data: ["Initial Stake", "Final Applied Stake"],
-        bottom: 10,
-      },
+      // legend: {
+      //   data: ["Initial Stake", "Final Applied Stake"],
+      //   bottom: 10,
+      // },
       grid: {
         left: "3%",
         right: "4%",
@@ -271,8 +289,16 @@
       },
       xAxis: {
         type: "category",
-        data: sortedResults.map((result) => result.candidate),
+        data: sortedResults.map((result) => result.id.address),
         axisLabel: {
+          formatter: function (value) {
+            if (value.length <= 10) {
+              return value;
+            }
+            const firstFive = value.substring(0, 5);
+            const lastFive = value.substring(value.length - 5);
+            return `${firstFive}..${lastFive}`;
+          },
           interval: 0,
           rotate: 45,
         },
@@ -379,10 +405,10 @@
 
   function getScatterPlotOptions() {
     const data = electionData.finalResults.map((result) => ({
-      name: result.candidate,
+      name: result.id.address,
       value: [
         result.initialStake,
-        result.finalScore * 1000000,
+        result.finalScore * 100000000,
         result.finalStake,
       ],
       role: result.role,
@@ -399,7 +425,7 @@
             <strong>${params.data.name}</strong><br>
             Role: ${params.data.role}<br>
             Initial Stake: ${params.data.value[0]}<br>
-            Final Score: ${(params.data.value[1] / 1000000).toFixed(6)}<br>
+            Final Score: ${params.data.value[1].toFixed(20)}<br>
             Final Stake: ${params.data.value[2]}
           `;
         },
@@ -648,7 +674,7 @@
         <h2>Final Election Results</h2>
         <p>
           This chart shows the final scores that determined the election
-          outcome. The higher the score, the better the candidate performed in
+          outcome. The lower the score, the better the candidate performed in
           the Phragmen algorithm. The top 7 candidates become Council Members,
           the next 7 become Runners Up.
         </p>
@@ -700,7 +726,7 @@
       <h3>Key Concepts:</h3>
       <ul>
         <li>
-          <strong>Score:</strong> Determines election order. Higher score = better
+          <strong>Score:</strong> Determines election order. Lower score = better
           chance of being elected.
         </li>
         <li>
@@ -804,7 +830,7 @@
 
   .chart {
     width: 100%;
-    height: 500px;
+    height: 700px;
   }
 
   .explanation {
