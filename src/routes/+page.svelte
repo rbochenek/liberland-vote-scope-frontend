@@ -1,5 +1,4 @@
 <script>
-  // import { onMount } from "svelte";
   import { navigating } from "$app/state";
   import { goto } from "$app/navigation";
 
