@@ -5,9 +5,8 @@ export const load: PageServerLoad = async ({ params }) => {
   // Get the block hash from URL params
   const { block_hash } = params;
 
-  // try {
   // Fetch real election data from the API
-  const response = await fetch(`http://localhost:8080/elections/${block_hash}`);
+  const response = await fetch(`http://localhost:8080/council/elections/${block_hash}`);
 
   // Check if the request was successful
   if (!response.ok) {
@@ -19,7 +18,7 @@ export const load: PageServerLoad = async ({ params }) => {
     const electionData = await response.json();
 
     // Log the data to help with debugging
-    console.log('Election data loaded:', electionData);
+    // console.log('Election data loaded:', electionData);
 
     // Do a basic validation check to make sure we have the expected data structure
     if (!electionData.electionData || !electionData.electionData.finalResults || !electionData.electionData.rounds) {

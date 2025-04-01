@@ -24,12 +24,12 @@
 
   // Navigation handlers
   function navigateToLatest() {
-    goto("/elections/at/latest");
+    goto("/council/elections/latest");
   }
 
   function navigateToCustomBlock() {
     if (validateBlockHash(blockHash)) {
-      goto(`/elections/at/${blockHash}`);
+      goto(`/council/elections/${blockHash}`);
     }
   }
 
@@ -48,7 +48,7 @@
       };
 
       const hash = blockHashMap[historicalElection];
-      goto(`/elections/at/${hash}`);
+      goto(`/council/elections/${hash}`);
     }
   }
 
