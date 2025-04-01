@@ -45,6 +45,9 @@
   // Chart instances storage
   const chartInstances = new Map();
 
+  // Scaling is required to display Echarts properly
+  const scoreScalingFactor = 1e20;
+
   // Window resize handler
   onMount(() => {
     window.addEventListener("resize", handleResize);
@@ -82,7 +85,7 @@
     // Prepare data for visualization
     const candidates = sortedResults.map((result) => result.id.address);
     const scores = sortedResults.map((result) => ({
-      value: result.finalScore * 100000000, // Scale for visibility
+      value: result.finalScore * scoreScalingFactor, // Scale for visibility
       itemStyle: {
         color:
           result.role === "Member"
@@ -95,16 +98,15 @@
 
     // Find actual threshold values by looking at the roles
     const memberThreshold =
-      sortedResults.find((r) => r.role === "Member")?.finalScore * 100000000000;
+      sortedResults.findLast((r) => r.role === "Member")?.finalScore *
+      scoreScalingFactor;
     const runnerUpThreshold =
-      sortedResults.find((r) => r.role === "RunnerUp")?.finalScore * 100000000;
-    console.log(sortedResults);
-    console.log("Member threshold:", memberThreshold);
-    console.log("RunnerUp threshold:", runnerUpThreshold);
+      sortedResults.findLast((r) => r.role === "RunnerUp")?.finalScore *
+      scoreScalingFactor;
 
     return {
       title: {
-        text: "Election Results (Phragmen Algorithm)",
+        text: "Election Results (Phragmén Algorithm)",
         left: "center",
       },
       tooltip: {
@@ -115,22 +117,23 @@
           const result = sortedResults[dataIndex];
           return `
             <strong>${result.id.address}</strong><br>
-            Score: ${result.finalScore.toFixed(20)}<br>
+            Score: ${result.finalScore * scoreScalingFactor}<br>
             Role: ${result.role}<br>
             Initial Stake: ${result.initialStake}<br>
             Final Stake: ${result.finalStake}
           `;
         },
       },
-      legend: {
-        data: ["Member", "RunnerUp", "Not Elected"],
-        bottom: 10,
-      },
+      // legend: {
+      //   data: ["Member", "RunnerUp", "Not Elected"],
+      //   bottom: 10,
+      // },
       grid: {
-        left: "3%",
-        right: "4%",
-        bottom: 80,
-        containLabel: true,
+        show: true,
+        top: "10%",
+        left: "8%",
+        right: "8%",
+        containLabel: false,
       },
       xAxis: {
         type: "category",
@@ -160,7 +163,7 @@
           type: "bar",
           data: scores,
           markLine: {
-            silent: true,
+            silent: false,
             lineStyle: {
               color: "#2563eb",
               type: "dashed",
@@ -168,18 +171,18 @@
             },
             data: [
               {
-                yAxis: memberThreshold, // Member threshold
+                yAxis: memberThreshold,
                 label: {
                   formatter: "Member Threshold",
-                  position: "middle",
+                  position: "insideStartTop",
                   distance: 10,
                 },
               },
               {
-                yAxis: runnerUpThreshold, // RunnerUp threshold
+                yAxis: runnerUpThreshold,
                 label: {
                   formatter: "RunnerUp Threshold",
-                  position: "middle",
+                  position: "insideStartTop",
                   distance: 10,
                 },
               },
@@ -675,7 +678,7 @@
         <p>
           This chart shows the final scores that determined the election
           outcome. The lower the score, the better the candidate performed in
-          the Phragmen algorithm. The top 7 candidates become Council Members,
+          the Phragmén algorithm. The top 7 candidates become Council Members,
           the next 7 become Runners Up.
         </p>
       </div>
@@ -685,7 +688,7 @@
         <h2>Initial Stake vs. Final Applied Stake</h2>
         <p>
           Compare each candidate's initial stake (lighter bars) with their final
-          applied stake (darker bars). Notice how the Phragmen algorithm
+          applied stake (darker bars). Notice how the Phragmén algorithm
           redistributes stake for proportional representation, which is why
           candidates with high initial stake may not always be elected.
         </p>
@@ -706,7 +709,7 @@
         <h2>Score Progression Across Rounds</h2>
         <p>
           This chart shows how candidate scores evolved during the election
-          process. As the Phragmen algorithm distributes votes, some candidates
+          process. As the Phragmén algorithm distributes votes, some candidates
           maintain their positions while others rise or fall.
         </p>
       </div>
@@ -715,9 +718,9 @@
   </div>
 
   <div class="explanation">
-    <h2>How the Weighted Phragmen Algorithm Works</h2>
+    <h2>How the Weighted Phragmén Algorithm Works</h2>
     <p>
-      The Phragmen algorithm selects candidates in a way that promotes
+      The Phragmén algorithm selects candidates in a way that promotes
       proportional representation, not just based on total stake. This ensures a
       balanced Council that represents the entire community, not just those with
       the highest backing.
