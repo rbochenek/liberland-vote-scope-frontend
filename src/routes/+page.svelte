@@ -65,7 +65,7 @@
     <h1>Welcome to Liberland Vote Scope</h1>
     <p>
       Understand how Council elections work on the Liberland blockchain through
-      interactive visualizations of the Weighted Phragmen algorithm.
+      interactive visualizations of the Weighted Phragmén algorithm.
     </p>
   </div>
 
