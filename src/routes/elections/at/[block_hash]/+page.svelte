@@ -47,6 +47,7 @@
 
   // Scaling is required to display Echarts properly
   const scoreScalingFactor = 1e20;
+  const stakeDivisor = 1e12;
 
   // Window resize handler
   onMount(() => {
@@ -119,18 +120,15 @@
             <strong>${result.id.address}</strong><br>
             Score: ${result.finalScore * scoreScalingFactor}<br>
             Role: ${result.role}<br>
-            Initial Stake: ${result.initialStake}<br>
-            Final Stake: ${result.finalStake}
+            Initial Stake: ${result.initialStake / stakeDivisor}<br>
+            Final Stake: ${result.finalStake / stakeDivisor}
           `;
         },
       },
-      // legend: {
-      //   data: ["Member", "RunnerUp", "Not Elected"],
-      //   bottom: 10,
-      // },
       grid: {
         show: true,
         top: "10%",
+        bottom: "10%",
         left: "8%",
         right: "8%",
         containLabel: false,
@@ -143,9 +141,8 @@
             if (value.length <= 10) {
               return value;
             }
-            const firstFive = value.substring(0, 5);
-            const lastFive = value.substring(value.length - 5);
-            return `${firstFive}..${lastFive}`;
+            const substr = value.substring(0, 8);
+            return `${substr}..`;
           },
           interval: 0,
           rotate: 45,
