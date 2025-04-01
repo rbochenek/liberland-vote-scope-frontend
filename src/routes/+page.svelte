@@ -1,6 +1,6 @@
-<!-- routes/+page.svelte -->
 <script>
-  import { onMount } from "svelte";
+  // import { onMount } from "svelte";
+  import { navigating } from "$app/state";
   import { goto } from "$app/navigation";
 
   let blockHash = "";
@@ -38,16 +38,14 @@
     if (historicalElection) {
       // Map election IDs to their corresponding block hashes
       const blockHashMap = {
-        "election-2025-01-30":
+        "election-2025-01-04":
           "0x1b983f5466bdf8675ddace127e48f809ea899246cb99d7a78d067d4a7e1de27d",
-        "election-2023-q3":
-          "0x6789abcdef1234567890abcdef1234567890abcdef1234567890abcdef123456",
-        "election-2023-q2":
-          "0x5678abcdef1234567890abcdef1234567890abcdef1234567890abcdef123456",
-        "election-2023-q1":
-          "0x4567abcdef1234567890abcdef1234567890abcdef1234567890abcdef123456",
-        "election-2022-q4":
-          "0x3456abcdef1234567890abcdef1234567890abcdef1234567890abcdef123456",
+        "election-2024-10-06":
+          "0x0effa6f64934c72b5573e4427b63626a2d4d9387ce20ffd45a235996b03a3dc2",
+        "election-2024-07-08":
+          "0x64fb91bc725e07ccdb0630fe35669f890d9214b77f6f74ef802be9c25891f0ee",
+        "election-2024-04-08":
+          "0xbf3c23706adb92d5bb29fa9bacf809c8e2ebaf483279dd865b37c43f7a43648b",
       };
 
       const hash = blockHashMap[historicalElection];
@@ -61,6 +59,11 @@
 </script>
 
 <div class="container">
+  {#if navigating.to}
+    <div class="page-loading-overlay">
+      <div class="page-spinner"></div>
+    </div>
+  {/if}
   <div class="header">
     <h1>Welcome to Liberland Vote Scope</h1>
     <p>
@@ -141,12 +144,10 @@
             <label for="historical-election">Select Election</label>
             <select id="historical-election" bind:value={historicalElection}>
               <option value="">-- Select an election --</option>
-              <option value="election-2025-01-30">Election 2025 Jan 30th</option
-              >
-              <option value="election-2023-q3">Election Q3 2023</option>
-              <option value="election-2023-q2">Election Q2 2023</option>
-              <option value="election-2023-q1">Election Q1 2023</option>
-              <option value="election-2022-q4">Election Q4 2022</option>
+              <option value="election-2025-01-04">2025 4th January</option>
+              <option value="election-2024-10-06">2024 6th October</option>
+              <option value="election-2024-07-08">2024 8th July</option>
+              <option value="election-2024-04-08">2024 8th April</option>
             </select>
           </div>
           <button
@@ -313,5 +314,35 @@
     color: #6b7280;
     font-size: 0.875rem;
     border-top: 1px solid #e5e7eb;
+  }
+
+  .page-loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    backdrop-filter: blur(3px);
+    transition: opacity 0.2s ease-in-out;
+  }
+
+  .page-spinner {
+    width: 50px;
+    height: 50px;
+    border: 5px solid rgba(37, 99, 235, 0.2);
+    border-radius: 50%;
+    border-top-color: #2563eb;
+    animation: spin 1s ease-in-out infinite;
+  }
+
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
   }
 </style>
