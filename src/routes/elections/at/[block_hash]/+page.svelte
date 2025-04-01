@@ -175,7 +175,7 @@
                 label: {
                   formatter: "Member Threshold",
                   position: "insideStartTop",
-                  distance: 10,
+                  distance: [8, 1],
                 },
               },
               {
@@ -183,7 +183,7 @@
                 label: {
                   formatter: "RunnerUp Threshold",
                   position: "insideStartTop",
-                  distance: 10,
+                  distance: [8, 1],
                 },
               },
             ],
