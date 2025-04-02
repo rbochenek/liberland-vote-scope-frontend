@@ -6,7 +6,8 @@ export const load: PageServerLoad = async ({ params }) => {
   const { block_hash } = params;
 
   // Fetch real election data from the API
-  const response = await fetch(`http://localhost:8080/council/elections/${block_hash}`);
+  // const response = await fetch(`http://localhost:8080/council/elections/${block_hash}`);
+  const response = await fetch(`http://liberland-vote-scope:8080/council/elections/${block_hash}`);
 
   // Check if the request was successful
   if (!response.ok) {
