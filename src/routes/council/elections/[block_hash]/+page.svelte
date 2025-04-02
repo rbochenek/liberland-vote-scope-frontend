@@ -502,7 +502,7 @@
 
   function getRoundProgressionOptions() {
     // Prepare data for progression chart
-    const candidates = electionData.finalResults.map((r) => r.candidate);
+    const candidates = electionData.finalResults.map((r) => r.id.address);
     const progressionData = [];
 
     // Extract data for each round
@@ -511,7 +511,7 @@
       const dataPoint = { round: `Round ${round.roundNumber}` };
 
       round.scores.forEach((score) => {
-        dataPoint[score.candidate] = score.score * 1000000; // Scale for visibility
+        dataPoint[score.id] = score.score * scoreScalingFactor; // Scale for visibility
       });
 
       progressionData.push(dataPoint);
@@ -520,7 +520,7 @@
     // Determine the roles for color coding
     const roles = {};
     electionData.finalResults.forEach((result) => {
-      roles[result.candidate] = result.role;
+      roles[result.id] = result.role;
     });
 
     // Create series for each candidate
@@ -560,46 +560,46 @@
         text: "Candidate Score Progression Across Rounds",
         left: "center",
       },
-      tooltip: {
-        trigger: "axis",
-        formatter: function (params) {
-          let result = params[0].axisValue + "<br/>";
-
-          // Sort by value descending
-          const sortedParams = [...params].sort((a, b) => b.value - a.value);
-
-          sortedParams.forEach((param) => {
-            const candidate = param.seriesName;
-            const role = roles[candidate];
-            const value = param.value;
-            const scaledValue = (value / 1000000).toFixed(6);
-
-            // Add role to tooltip
-            result += `${param.marker} ${candidate} (${role}): ${scaledValue}<br/>`;
-          });
-
-          return result;
-        },
-      },
-      legend: {
-        type: "scroll",
-        orient: "horizontal",
-        data: candidates,
-        bottom: 10,
-        formatter: function (name) {
-          const role = roles[name];
-          return role === "Member"
-            ? `${name} (M)`
-            : role === "RunnerUp"
-              ? `${name} (R)`
-              : name;
-        },
-        selected: candidates.reduce((acc, candidate) => {
-          // Only display Members and RunnersUp by default
-          acc[candidate] = roles[candidate] !== "NotElected";
-          return acc;
-        }, {}),
-      },
+      // tooltip: {
+      //   trigger: "axis",
+      //   formatter: function (params) {
+      //     let result = params[0].axisValue + "<br/>";
+      //
+      //     // Sort by value descending
+      //     const sortedParams = [...params].sort((a, b) => b.value - a.value);
+      //
+      //     sortedParams.forEach((param) => {
+      //       const candidate = param.seriesName;
+      //       const role = roles[candidate];
+      //       const value = param.value;
+      //       const scaledValue = (value / 1000000).toFixed(6);
+      //
+      //       // Add role to tooltip
+      //       result += `${param.marker} ${candidate} (${role}): ${scaledValue}<br/>`;
+      //     });
+      //
+      //     return result;
+      //   },
+      // },
+      // legend: {
+      //   type: "scroll",
+      //   orient: "horizontal",
+      //   data: candidates,
+      //   bottom: 10,
+      //   formatter: function (name) {
+      //     const role = roles[name];
+      //     return role === "Member"
+      //       ? `${name} (M)`
+      //       : role === "RunnerUp"
+      //         ? `${name} (R)`
+      //         : name;
+      //   },
+      //   selected: candidates.reduce((acc, candidate) => {
+      //     // Only display Members and RunnersUp by default
+      //     acc[candidate] = roles[candidate] !== "NotElected";
+      //     return acc;
+      //   }, {}),
+      // },
       grid: {
         left: "3%",
         right: "4%",
