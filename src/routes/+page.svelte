@@ -40,11 +40,11 @@
         "election-2025-01-04":
           "0x1b983f5466bdf8675ddace127e48f809ea899246cb99d7a78d067d4a7e1de27d",
         "election-2024-10-06":
-          "0x0effa6f64934c72b5573e4427b63626a2d4d9387ce20ffd45a235996b03a3dc2",
+          "0x72ae7b8bd1e828cfaf7359da593a92d6832136f2bf30ca530a35957ea1fe2617",
         "election-2024-07-08":
-          "0x64fb91bc725e07ccdb0630fe35669f890d9214b77f6f74ef802be9c25891f0ee",
+          "0x1838b600a3142a374b43c5bec8632df6b469ab9fb84fc4f53bddfbb9e4484654",
         "election-2024-04-08":
-          "0xbf3c23706adb92d5bb29fa9bacf809c8e2ebaf483279dd865b37c43f7a43648b",
+          "0x3995cd7d5a43ddfd3dac63ca388fd134a4f484484e6edeb8f8f7537d7dbcbbd8",
       };
 
       const hash = blockHashMap[historicalElection];
