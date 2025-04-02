@@ -409,12 +409,14 @@
     const data = electionData.finalResults.map((result) => ({
       name: result.id.address,
       value: [
-        result.initialStake,
-        result.finalScore * 100000000,
-        result.finalStake,
+        result.initialStake / stakeDivisor,
+        result.finalScore * scoreScalingFactor,
+        result.finalStake / stakeDivisor,
       ],
       role: result.role,
     }));
+
+    console.log(data);
 
     return {
       title: {
@@ -427,8 +429,8 @@
             <strong>${params.data.name}</strong><br>
             Role: ${params.data.role}<br>
             Initial Stake: ${params.data.value[0]}<br>
-            Final Score: ${params.data.value[1].toFixed(20)}<br>
-            Final Stake: ${params.data.value[2]}
+            Final Stake: ${params.data.value[2]}<br>
+            Final Score: ${params.data.value[1]}
           `;
         },
       },
@@ -437,9 +439,11 @@
         bottom: 10,
       },
       grid: {
-        left: "3%",
-        right: "4%",
-        bottom: 60,
+        show: true,
+        top: "10%",
+        bottom: "10%",
+        left: "5%",
+        right: "5%",
         containLabel: true,
       },
       xAxis: {
@@ -460,7 +464,7 @@
           itemStyle: { color: "#2563eb" },
           data: data.filter((item) => item.role === "Member"),
           label: {
-            show: true,
+            show: false,
             position: "right",
             formatter: function (param) {
               return param.data.name;
@@ -475,7 +479,7 @@
           itemStyle: { color: "#7c3aed" },
           data: data.filter((item) => item.role === "RunnerUp"),
           label: {
-            show: true,
+            show: false,
             position: "right",
             formatter: function (param) {
               return param.data.name;
@@ -490,7 +494,7 @@
           itemStyle: { color: "#94a3b8" },
           data: data.filter((item) => item.role === "NotElected"),
           label: {
-            show: true,
+            show: false,
             position: "right",
             formatter: function (param) {
               return param.data.name;
