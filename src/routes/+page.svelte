@@ -58,6 +58,10 @@
   $: historicalButtonDisabled = !historicalElection;
 </script>
 
+<svelte:head>
+  <title>Liberland Vote Scope</title>
+</svelte:head>
+
 <div class="container">
   {#if navigating.to}
     <div class="page-loading-overlay">
@@ -68,7 +72,7 @@
     <h1>Welcome to Liberland Vote Scope</h1>
     <p>
       Understand how Council elections work on the Liberland blockchain through
-      interactive visualizations of the Weighted Phragmén algorithm.
+      interactive visualizations of the algorithm.
     </p>
   </div>
 
