@@ -50,6 +50,10 @@
   const stakeDivisor = 1e12;
 
   function scaleScore(value: number) {
+    if (!Number.isFinite(value)) {
+      return 0;
+    }
+
     return 1 / (value * scoreScalingFactor);
   }
 
@@ -57,7 +61,7 @@
     return value / stakeDivisor;
   }
 
-  function format_account_label(name: string) {
+  function formatAccountLabel(name: string) {
     const MAX_CHARS = 32;
     if (name.length <= MAX_CHARS) {
       return name;
@@ -66,11 +70,11 @@
     return `${substr}..`;
   }
 
-  function format_score(score: number) {
+  function formatScore(score: number) {
     return `${score.toFixed(3)}`;
   }
 
-  function format_stake(stake: number) {
+  function formatStake(stake: number) {
     return `${stake.toFixed(2)}`;
   }
 
@@ -155,10 +159,10 @@
           const result = sortedResults[dataIndex];
           return `
             <strong>${result.id.displayName ? result.id.displayName : result.id.address}</strong><br>
-            Score: ${format_score(result.finalScore)}<br>
+            Score: ${formatScore(result.finalScore)}<br>
             Role: ${result.role}<br>
-            Initial Stake: ${format_stake(result.initialStake / stakeDivisor)}<br>
-            Final Stake: ${format_stake(result.finalStake / stakeDivisor)}
+            Initial Stake: ${formatStake(result.initialStake / stakeDivisor)}<br>
+            Final Stake: ${formatStake(result.finalStake / stakeDivisor)}
           `;
         },
       },
@@ -174,7 +178,7 @@
         type: "category",
         data: candidates,
         axisLabel: {
-          formatter: format_account_label,
+          formatter: formatAccountLabel,
           fontSize: 14,
           interval: 0,
           rotate: 45,
@@ -317,9 +321,9 @@
           return `
             <strong>${result.id.displayName ? result.id.displayName : result.id.address}</strong><br>
             Role: ${result.role}<br>
-            Initial Stake: ${format_stake(params[0].value)}<br>
-            Final Stake: ${format_stake(params[1].value)}<br>
-            Difference: ${format_stake(params[0].value - params[1].value)}
+            Initial Stake: ${formatStake(params[0].value)}<br>
+            Final Stake: ${formatStake(params[1].value)}<br>
+            Difference: ${formatStake(params[0].value - params[1].value)}
           `;
         },
       },
@@ -339,7 +343,7 @@
         type: "category",
         data: candidates,
         axisLabel: {
-          formatter: format_account_label,
+          formatter: formatAccountLabel,
           fontSize: 14,
           interval: 0,
           rotate: 45,
@@ -456,8 +460,6 @@
       role: result.role,
     }));
 
-    console.log(data);
-
     return {
       title: {
         text: "Election Score vs Initial Stake",
@@ -468,9 +470,9 @@
           return `
             <strong>${params.data.name}</strong><br>
             Role: ${params.data.role}<br>
-            Initial Stake: ${format_stake(params.data.value[0])}<br>
-            Final Stake: ${format_stake(params.data.value[2])}<br>
-            Final Score: ${format_score(params.data.value[1])}
+            Initial Stake: ${formatStake(params.data.value[0])}<br>
+            Final Stake: ${formatStake(params.data.value[2])}<br>
+            Final Score: ${formatScore(params.data.value[1])}
           `;
         },
       },
@@ -548,8 +550,17 @@
 
   function getRoundProgressionOptions() {
     // Prepare data for progression chart
-    const candidates = electionData.finalResults.map((r) => r.id.address);
+    // const candidates = electionData.finalResults.map((r) => r.id.address);
     const progressionData = [];
+
+    // Extract candidate names
+    const candidates = electionData.finalResults.map((result) => {
+      if (result.id.displayName !== undefined) {
+        return result.id.displayName;
+      } else {
+        return result.id.address;
+      }
+    });
 
     // Extract data for each round
     for (let i = 0; i < electionData.rounds.length; i++) {
@@ -557,7 +568,9 @@
       const dataPoint = { round: `Round ${round.roundNumber}` };
 
       round.scores.forEach((score) => {
-        dataPoint[score.id.address] = score.score * scoreScalingFactor; // Scale for visibility
+        dataPoint[
+          score.id.displayName ? score.id.displayName : score.id.address
+        ] = scaleScore(score.score); // Scale for visibility
       });
 
       progressionData.push(dataPoint);
@@ -566,7 +579,8 @@
     // Determine the roles for color coding
     const roles = {};
     electionData.finalResults.forEach((result) => {
-      roles[result.id.address] = result.role;
+      roles[result.id.displayName ? result.id.displayName : result.id.address] =
+        result.role;
     });
 
     // Create series for each candidate
@@ -574,15 +588,12 @@
       return {
         name: candidate,
         type: "line",
+        smooth: true,
         emphasis: { focus: "series" },
         data: progressionData.map((round) => round[candidate]),
         lineStyle: {
-          width:
-            roles[candidate] === "Member"
-              ? 2
-              : roles[candidate] === "RunnerUp"
-                ? 2
-                : 1,
+          width: 1,
+          type: "solid",
           color:
             roles[candidate] === "Member"
               ? "#2563eb"
@@ -630,10 +641,10 @@
         type: "scroll",
         orient: "horizontal",
         data: candidates,
-        bottom: 10,
+        bottom: 0,
         formatter: function (name) {
           const role = roles[name];
-          const fmt_name = format_account_label(name);
+          const fmt_name = formatAccountLabel(name);
           return role === "Member"
             ? `${fmt_name}`
             : role === "RunnerUp"
@@ -649,10 +660,9 @@
       grid: {
         show: true,
         top: "10%",
-        bottom: "10%",
-        left: "5%",
-        right: "5%",
-        bottom: 80,
+        bottom: "8%",
+        left: "3%",
+        right: "3%",
         containLabel: true,
       },
       xAxis: {
@@ -677,15 +687,11 @@
 <div class="container">
   <div class="header">
     <h1>Liberland Vote Scope</h1>
-    {#if data.data.blockHash === "latest"}
-      <p class="subtitle">Council Election Simulation at Current Block</p>
-    {:else}
-      <p class="subtitle">
-        Council Election at Block: <span class="block-hash"
-          >{data.data.blockHash}</span
-        >
-      </p>
-    {/if}
+    <p class="subtitle">
+      Council Election at Block: <span class="block-hash"
+        >{data.data.election.blockHash}</span
+      >
+    </p>
   </div>
 
   <div class="tab-container">
@@ -878,6 +884,8 @@
   }
 
   .chart {
+    margin-top: 50px;
+    margin-bottom: 50px;
     width: 100%;
     height: 700px;
   }
