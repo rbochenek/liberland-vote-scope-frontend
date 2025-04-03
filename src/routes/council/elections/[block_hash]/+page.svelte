@@ -66,6 +66,14 @@
     return `${substr}..`;
   }
 
+  function format_score(score: number) {
+    return `${score.toFixed(3)}`;
+  }
+
+  function format_stake(stake: number) {
+    return `${stake.toFixed(2)}`;
+  }
+
   // Window resize handler
   onMount(() => {
     window.addEventListener("resize", handleResize);
@@ -147,17 +155,17 @@
           const result = sortedResults[dataIndex];
           return `
             <strong>${result.id.displayName ? result.id.displayName : result.id.address}</strong><br>
-            Score: ${result.finalScore}<br>
+            Score: ${format_score(result.finalScore)}<br>
             Role: ${result.role}<br>
-            Initial Stake: ${result.initialStake / stakeDivisor}<br>
-            Final Stake: ${result.finalStake / stakeDivisor}
+            Initial Stake: ${format_stake(result.initialStake / stakeDivisor)}<br>
+            Final Stake: ${format_stake(result.finalStake / stakeDivisor)}
           `;
         },
       },
       grid: {
         show: true,
         top: "10%",
-        bottom: "5%",
+        bottom: "3%",
         left: "3%",
         right: "3%",
         containLabel: true,
@@ -167,17 +175,14 @@
         data: candidates,
         axisLabel: {
           formatter: format_account_label,
-          fontWeight: "normal",
           fontSize: 14,
           interval: 0,
           rotate: 45,
-          inside: false,
         },
       },
       yAxis: {
         type: "value",
         name: "Score",
-        inverse: false,
       },
       series: [
         {
@@ -284,9 +289,19 @@
     );
     const sortedResults = sortedResults_unscaled.map((item) => ({
       ...item,
-      initialStake: item.initialStake / stakeDivisor,
-      finalStake: item.finalStake / stakeDivisor,
+      finalScore: scaleScore(item.finalScore),
+      initialStake: scaleStake(item.initialStake),
+      finalStake: scaleStake(item.finalStake),
     }));
+
+    // Extract candidate names
+    const candidates = sortedResults.map((result) => {
+      if (result.id.displayName !== undefined) {
+        return result.id.displayName;
+      } else {
+        return result.id.address;
+      }
+    });
 
     return {
       title: {
@@ -300,11 +315,11 @@
           const dataIndex = params[0].dataIndex;
           const result = sortedResults[dataIndex];
           return `
-            <strong>${result.id.address}</strong><br>
+            <strong>${result.id.displayName ? result.id.displayName : result.id.address}</strong><br>
             Role: ${result.role}<br>
-            Initial Stake: ${params[0].value}<br>
-            Final Stake: ${params[1].value}<br>
-            Difference: ${params[0].value - params[1].value}
+            Initial Stake: ${format_stake(params[0].value)}<br>
+            Final Stake: ${format_stake(params[1].value)}<br>
+            Difference: ${format_stake(params[0].value - params[1].value)}
           `;
         },
       },
@@ -315,16 +330,17 @@
       grid: {
         show: true,
         top: "10%",
-        bottom: "10%",
-        left: "8%",
-        right: "8%",
-        containLabel: false,
+        bottom: "3%",
+        left: "3%",
+        right: "3%",
+        containLabel: true,
       },
       xAxis: {
         type: "category",
-        data: sortedResults.map((result) => result.id.address),
+        data: candidates,
         axisLabel: {
           formatter: format_account_label,
+          fontSize: 14,
           interval: 0,
           rotate: 45,
         },
