@@ -447,11 +447,11 @@
 
   function getScatterPlotOptions() {
     const data = electionData.finalResults.map((result) => ({
-      name: result.id.address,
+      name: result.id.displayName ? result.id.displayName : result.id.address,
       value: [
-        result.initialStake / stakeDivisor,
-        result.finalScore * scoreScalingFactor,
-        result.finalStake / stakeDivisor,
+        scaleStake(result.initialStake),
+        scaleScore(result.finalScore),
+        scaleStake(result.finalStake),
       ],
       role: result.role,
     }));
@@ -468,22 +468,22 @@
           return `
             <strong>${params.data.name}</strong><br>
             Role: ${params.data.role}<br>
-            Initial Stake: ${params.data.value[0]}<br>
-            Final Stake: ${params.data.value[2]}<br>
-            Final Score: ${params.data.value[1]}
+            Initial Stake: ${format_stake(params.data.value[0])}<br>
+            Final Stake: ${format_stake(params.data.value[2])}<br>
+            Final Score: ${format_score(params.data.value[1])}
           `;
         },
       },
       legend: {
-        data: ["Member", "RunnerUp", "Not Elected"],
+        data: ["Members", "Runners Up", "Not Elected"],
         bottom: 10,
       },
       grid: {
         show: true,
         top: "10%",
-        bottom: "10%",
-        left: "5%",
-        right: "5%",
+        bottom: "8%",
+        left: "3%",
+        right: "3%",
         containLabel: true,
       },
       xAxis: {
@@ -498,7 +498,7 @@
       },
       series: [
         {
-          name: "Member",
+          name: "Members",
           type: "scatter",
           symbolSize: 20,
           itemStyle: { color: "#2563eb" },
@@ -513,7 +513,7 @@
           },
         },
         {
-          name: "RunnerUp",
+          name: "Runners Up",
           type: "scatter",
           symbolSize: 20,
           itemStyle: { color: "#7c3aed" },
