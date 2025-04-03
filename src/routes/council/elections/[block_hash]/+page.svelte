@@ -684,6 +684,10 @@
   }
 </script>
 
+<svelte:head>
+  <title>Liberland Vote Scope</title>
+</svelte:head>
+
 <div class="container">
   <div class="header">
     <h1>Liberland Vote Scope</h1>
@@ -729,9 +733,9 @@
         <h2>Final Election Results</h2>
         <p>
           This chart shows the final scores that determined the election
-          outcome. The lower the score, the better the candidate performed in
-          the Phragmén algorithm. The top 7 candidates become Council Members,
-          the next 7 become Runners Up.
+          outcome. The higher the score, the better the candidate performed in
+          the elections. The top 7 candidates become Council Members, the next 7
+          become Runners Up.
         </p>
       </div>
       <div class="chart" use:echartAction={getElectionResultsOptions()}></div>
@@ -740,9 +744,9 @@
         <h2>Initial Stake vs. Final Applied Stake</h2>
         <p>
           Compare each candidate's initial stake (lighter bars) with their final
-          applied stake (darker bars). Notice how the Phragmén algorithm
-          redistributes stake for proportional representation, which is why
-          candidates with high initial stake may not always be elected.
+          applied stake (darker bars). Notice how the algorithm redistributes
+          stake for proportional representation, which is why candidates with
+          high initial stake may not always be elected.
         </p>
       </div>
       <div class="chart" use:echartAction={getStakeComparisonOptions()}></div>
@@ -761,8 +765,8 @@
         <h2>Score Progression Across Rounds</h2>
         <p>
           This chart shows how candidate scores evolved during the election
-          process. As the Phragmén algorithm distributes votes, some candidates
-          maintain their positions while others rise or fall.
+          process. As the algorithm distributes votes, some candidates maintain
+          their positions while others rise or fall.
         </p>
       </div>
       <div class="chart" use:echartAction={getRoundProgressionOptions()}></div>
@@ -770,27 +774,23 @@
   </div>
 
   <div class="explanation">
-    <h2>How the Weighted Phragmén Algorithm Works</h2>
+    <h2>How the Algorithm Works</h2>
     <p>
-      The Phragmén algorithm selects candidates in a way that promotes
-      proportional representation, not just based on total stake. This ensures a
-      balanced Council that represents the entire community, not just those with
-      the highest backing.
+      The algorithm selects candidates in a way that promotes proportional
+      representation, not just based on total stake. This ensures a balanced
+      Council that represents the entire community, not just those with the
+      highest backing.
     </p>
     <div class="key-concepts">
       <h3>Key Concepts:</h3>
       <ul>
         <li>
-          <strong>Score:</strong> Determines election order. Lower score = better
+          <strong>Score:</strong> Determines election order. Higher score = better
           chance of being elected.
         </li>
         <li>
           <strong>Load Balancing:</strong> Distributes stake to promote fair representation
           across all voters.
-        </li>
-        <li>
-          <strong>Edge Weight:</strong> How a voter's stake is split among their
-          chosen candidates.
         </li>
       </ul>
     </div>
