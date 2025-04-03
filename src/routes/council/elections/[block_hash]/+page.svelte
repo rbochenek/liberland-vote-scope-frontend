@@ -45,9 +45,26 @@
   // Chart instances storage
   const chartInstances = new Map();
 
-  // Scaling is required to display Echarts properly
-  const scoreScalingFactor = 1e20;
+  // Score / Stake scaling
+  const scoreScalingFactor = 1e16;
   const stakeDivisor = 1e12;
+
+  function scaleScore(value: number) {
+    return 1 / (value * scoreScalingFactor);
+  }
+
+  function scaleStake(value: number) {
+    return value / stakeDivisor;
+  }
+
+  function format_account_label(name: string) {
+    const MAX_CHARS = 32;
+    if (name.length <= MAX_CHARS) {
+      return name;
+    }
+    const substr = name.substring(0, MAX_CHARS - 2);
+    return `${substr}..`;
+  }
 
   // Window resize handler
   onMount(() => {
@@ -76,25 +93,29 @@
     };
   }
 
-  function format_account_label(name) {
-    if (name.length <= 10) {
-      return name;
-    }
-    const substr = name.substring(0, 8);
-    return `${substr}..`;
-  }
-
-  // Chart configurations
+  // Chart config for "Election Results"
   function getElectionResultsOptions() {
-    // Sort candidates by score
-    const sortedResults = [...electionData.finalResults].sort(
+    // Sort and scale scores
+    const sortedResults_unscaled = [...electionData.finalResults].sort(
       (a, b) => a.finalScore - b.finalScore,
     );
+    const sortedResults = sortedResults_unscaled.map((result) => ({
+      ...result,
+      finalScore: scaleScore(result.finalScore),
+    }));
 
-    // Prepare data for visualization
-    const candidates = sortedResults.map((result) => result.id.address);
+    // Extract candidate names
+    const candidates = sortedResults.map((result) => {
+      if (result.id.displayName !== undefined) {
+        return result.id.displayName;
+      } else {
+        return result.id.address;
+      }
+    });
+
+    // Data transform
     const scores = sortedResults.map((result) => ({
-      value: result.finalScore * scoreScalingFactor, // Scale for visibility
+      value: result.finalScore, // Scale for visibility
       itemStyle: {
         color:
           result.role === "Member"
@@ -106,12 +127,12 @@
     }));
 
     // Find actual threshold values by looking at the roles
-    const memberThreshold =
-      sortedResults.findLast((r) => r.role === "Member")?.finalScore *
-      scoreScalingFactor;
-    const runnerUpThreshold =
-      sortedResults.findLast((r) => r.role === "RunnerUp")?.finalScore *
-      scoreScalingFactor;
+    const memberThreshold = sortedResults.findLast(
+      (r) => r.role === "Member",
+    )?.finalScore;
+    const runnerUpThreshold = sortedResults.findLast(
+      (r) => r.role === "RunnerUp",
+    )?.finalScore;
 
     return {
       title: {
@@ -125,8 +146,8 @@
           const dataIndex = params[0].dataIndex;
           const result = sortedResults[dataIndex];
           return `
-            <strong>${result.id.address}</strong><br>
-            Score: ${result.finalScore * scoreScalingFactor}<br>
+            <strong>${result.id.displayName ? result.id.displayName : result.id.address}</strong><br>
+            Score: ${result.finalScore}<br>
             Role: ${result.role}<br>
             Initial Stake: ${result.initialStake / stakeDivisor}<br>
             Final Stake: ${result.finalStake / stakeDivisor}
@@ -136,16 +157,18 @@
       grid: {
         show: true,
         top: "10%",
-        bottom: "10%",
-        left: "5%",
-        right: "5%",
-        containLabel: false,
+        bottom: "5%",
+        left: "3%",
+        right: "3%",
+        containLabel: true,
       },
       xAxis: {
         type: "category",
         data: candidates,
         axisLabel: {
           formatter: format_account_label,
+          fontWeight: "normal",
+          fontSize: 14,
           interval: 0,
           rotate: 45,
           inside: false,
@@ -166,23 +189,24 @@
             lineStyle: {
               color: "#2563eb",
               type: "dashed",
-              width: 2,
+              width: 1,
             },
+            symbol: "none",
             data: [
               {
                 yAxis: memberThreshold,
                 label: {
                   formatter: "Member Threshold",
-                  position: "insideStartTop",
-                  distance: [8, 1],
+                  position: "insideEndTop",
+                  distance: 5,
                 },
               },
               {
                 yAxis: runnerUpThreshold,
                 label: {
                   formatter: "RunnerUp Threshold",
-                  position: "insideStartTop",
-                  distance: [8, 1],
+                  position: "insideEndTop",
+                  distance: 5,
                 },
               },
             ],
