@@ -1,17 +1,18 @@
 import { error } from '@sveltejs/kit';
+import { dev } from '$app/environment';
 import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ params }) => {
   // Get the block hash from URL params
   const { block_hash } = params;
 
-  // Fetch real election data from the API
-  // const response = await fetch(`http://localhost:8080/council/elections/${block_hash}`);
-  const response = await fetch(`http://liberland-vote-scope:8080/council/elections/${block_hash}`);
+  // Fetch election data from the backend
+  const backendHost = dev ? "localhost:8080" : "liberland-vote-scope:8080";
+  const response = await fetch(`http://${backendHost}/council/elections/${block_hash}`);
 
   // Check if the request was successful
   if (!response.ok) {
-    throw new Error(`API responded with status: ${response.status}`);
+    throw new Error(`Backend responded with status: ${response.status}`);
   }
 
   try {
@@ -23,7 +24,7 @@ export const load: PageServerLoad = async ({ params }) => {
 
     // Do a basic validation check to make sure we have the expected data structure
     if (!electionData.electionData || !electionData.electionData.finalResults || !electionData.electionData.rounds) {
-      throw new Error('API response is missing expected data structure');
+      throw new Error('Backend response is missing expected data structure');
     }
 
     const data = {
