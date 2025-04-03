@@ -164,10 +164,6 @@
       </div>
     </div>
   </div>
-
-  <div class="footer">
-    <p>Liberland Vote Scope &copy; 2025</p>
-  </div>
 </div>
 
 <style>
@@ -213,6 +209,7 @@
     display: grid;
     grid-template-columns: 1fr;
     gap: 20px;
+    padding-top: 20px;
   }
 
   @media (min-width: 768px) {
