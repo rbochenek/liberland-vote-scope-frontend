@@ -37,7 +37,8 @@
     if (historicalElection) {
       // Map election IDs to their corresponding block hashes
       const blockHashMap = {
-        "election-2025-04-04": "YET_UNKNOWN",
+        "election-2025-04-04":
+          "0x4bc09a49570900f80a1a73706f36f7df9398e4ee9ebf065445aa7ec8fa124c43",
         "election-2025-01-04":
           "0x1b983f5466bdf8675ddace127e48f809ea899246cb99d7a78d067d4a7e1de27d",
         "election-2024-10-06":
@@ -148,9 +149,7 @@
             <label for="historical-election">Select Election</label>
             <select id="historical-election" bind:value={historicalElection}>
               <option value="">-- Select an election --</option>
-              <option value="election-2025-04-04" disabled
-                >2025 4th April</option
-              >
+              <option value="election-2025-04-04">2025 4th April</option>
               <option value="election-2025-01-04">2025 4th January</option>
               <option value="election-2024-10-06">2024 6th October</option>
               <option value="election-2024-07-08">2024 8th July</option>
