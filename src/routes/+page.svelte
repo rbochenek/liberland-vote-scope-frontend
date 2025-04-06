@@ -310,15 +310,6 @@
     cursor: not-allowed;
   }
 
-  .footer {
-    text-align: center;
-    padding: 20px;
-    margin-top: 40px;
-    color: #6b7280;
-    font-size: 0.875rem;
-    border-top: 1px solid #e5e7eb;
-  }
-
   .page-loading-overlay {
     position: fixed;
     top: 0;
