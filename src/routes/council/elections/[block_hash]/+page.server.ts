@@ -19,21 +19,8 @@ export const load: PageServerLoad = async ({ params }) => {
     // Parse the JSON response
     const electionData = await response.json();
 
-    // Log the data to help with debugging
-    // console.log('Election data loaded:', electionData);
-
-    // Do a basic validation check to make sure we have the expected data structure
-    if (!electionData.electionData || !electionData.electionData.finalResults || !electionData.electionData.rounds) {
-      throw new Error('Backend response is missing expected data structure');
-    }
-
-    const data = {
-      blockHash: block_hash,
-      election: electionData,
-    }
-
     return {
-      data
+      electionData,
     };
   } catch (err) {
     console.error('Error loading election data:', err);
